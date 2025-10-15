@@ -52,7 +52,7 @@ The Airbnb clone database will have the following tables:
 4. reviews
 5. payments
 
-#### 🧑‍💻 1. Users Table
+#### 1. Users Table
 
 Stores information about guests, hosts, and admins.
 
@@ -124,7 +124,7 @@ Guests leave reviews for properties they’ve stayed at.
 
 ---
 
-#### 💳 5. Payments Table
+#### 5. Payments Table
 
 Records all payment transactions related to bookings.
 

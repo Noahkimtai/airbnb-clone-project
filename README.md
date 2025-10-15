@@ -43,6 +43,101 @@ The backend for the Airbnb Clone project is designed to provide a robust and sca
 - Redis: Used for caching and session management.
 - Docker: Containerization tool for consistent development and deployment environments.
 - CI/CD Pipelines: Automated pipelines for testing and deploying code changes.
+## Database Design
+This database schema outlines the structure and relationships between the main entities of an Airbnb clone application.
+The Airbnb clone database will have the following tables:
+1. users
+2. properties
+3. bookings
+4. reviews
+5. payments
+
+#### 🧑‍💻 1. Users Table
+
+Stores information about guests, hosts, and admins.
+
+| Field Name    | Data Type       | Constraints                        | Description |
+|----------------|-----------------|------------------------------------|-------------|
+| user_id        | BIGINT (PK)     | PRIMARY KEY, AUTO INCREMENT        | Unique identifier for each user |
+| first_name     | VARCHAR(100)    | NOT NULL                           | User’s first name |
+| last_name      | VARCHAR(100)    | NOT NULL                           | User’s last name |
+| email          | VARCHAR(255)    | UNIQUE, NOT NULL                   | User’s email (login credential) |
+| password_hash  | VARCHAR(255)    | NOT NULL                           | Hashed password |
+| phone_number   | VARCHAR(20)     | NULL                               | User’s contact number |
+| user_type      | ENUM('guest','host','admin') | DEFAULT 'guest' | Type of user |
+| created_at     | DATETIME        | DEFAULT CURRENT_TIMESTAMP          | Account creation timestamp |
+| updated_at     | DATETIME        | ON UPDATE CURRENT_TIMESTAMP        | Last update timestamp |
+
+---
+
+####  2. Properties Table
+
+Holds details about listings created by hosts.
+
+| Field Name      | Data Type       | Constraints                        | Description |
+|-----------------|-----------------|------------------------------------|-------------|
+| property_id     | BIGINT (PK)     | PRIMARY KEY, AUTO INCREMENT        | Unique property ID |
+| host_id         | BIGINT (FK)     | REFERENCES users(user_id)          | The host who owns this property |
+| title           | VARCHAR(255)    | NOT NULL                           | Listing title |
+| description     | TEXT            | NULL                               | Description of the property |
+| address         | VARCHAR(255)    | NOT NULL                           | Property address |
+| city            | VARCHAR(100)    | NOT NULL                           | City |
+| country         | VARCHAR(100)    | NOT NULL                           | Country |
+| price_per_night | DECIMAL(10,2)   | NOT NULL                           | Cost per night |
+| max_guests      | INT             | DEFAULT 1                          | Maximum allowed guests |
+| created_at      | DATETIME        | DEFAULT CURRENT_TIMESTAMP          | Listing creation timestamp |
+| updated_at      | DATETIME        | ON UPDATE CURRENT_TIMESTAMP        | Last update timestamp |
+
+---
+
+####  3. Bookings Table
+
+Tracks reservations made by guests.
+
+| Field Name     | Data Type       | Constraints                        | Description |
+|----------------|-----------------|------------------------------------|-------------|
+| booking_id     | BIGINT (PK)     | PRIMARY KEY, AUTO INCREMENT        | Unique booking ID |
+| property_id    | BIGINT (FK)     | REFERENCES properties(property_id) | The booked property |
+| guest_id       | BIGINT (FK)     | REFERENCES users(user_id)          | Guest who made the booking |
+| check_in_date  | DATE            | NOT NULL                           | Check-in date |
+| check_out_date | DATE            | NOT NULL                           | Check-out date |
+| total_price    | DECIMAL(10,2)   | NOT NULL                           | Total cost of stay |
+| status         | ENUM('pending','confirmed','cancelled', 'completed') | DEFAULT 'pending' | Booking status |
+| created_at     | DATETIME        | DEFAULT CURRENT_TIMESTAMP          | Booking creation timestamp |
+| updated_at     | DATETIME        | ON UPDATE CURRENT_TIMESTAMP        | Last update timestamp |
+
+---
+
+####  4. Reviews Table
+
+Guests leave reviews for properties they’ve stayed at.
+
+| Field Name  | Data Type       | Constraints                        | Description |
+|--------------|-----------------|------------------------------------|-------------|
+| review_id    | BIGINT (PK)     | PRIMARY KEY, AUTO INCREMENT        | Unique review ID |
+| booking_id   | BIGINT (FK)     | REFERENCES bookings(booking_id)    | Review is tied to a booking |
+| property_id  | BIGINT (FK)     | REFERENCES properties(property_id) | The reviewed property |
+| guest_id     | BIGINT (FK)     | REFERENCES users(user_id)          | Guest who wrote the review |
+| rating       | INT             | CHECK (rating BETWEEN 1 AND 5)     | Star rating (1–5) |
+| comment      | TEXT            | NULL                               | Review text |
+| created_at   | DATETIME        | DEFAULT CURRENT_TIMESTAMP          | Review creation timestamp |
+
+---
+
+#### 💳 5. Payments Table
+
+Records all payment transactions related to bookings.
+
+| Field Name      | Data Type                                            | Constraints                        | Description |
+|-----------------|------------------------------------------------------|------------------------------------|-------------|
+| payment_id      | BIGINT (PK)                                          | PRIMARY KEY, AUTO INCREMENT        | Unique payment ID |
+| booking_id      | BIGINT (FK)                                          | REFERENCES bookings(booking_id)    | Booking being paid for |
+| user_id         | BIGINT (FK)                                          | REFERENCES users(user_id)          | The paying user (guest) |
+| amount          | DECIMAL(10,2)                                        | NOT NULL                           | Payment amount |
+| payment_method  | ENUM('credit_card','paypal','bank_transfer','other') | NOT NULL                           | Payment method |
+| status          | ENUM('pending', 'completed',' failed', 'refunded')   | DEFAULT 'pending'                  | Payment status |
+| transaction_date| DATETIME                                             | DEFAULT CURRENT_TIMESTAMP          | Payment timestamp |
+
 
 ## Team Roles
 - Backend Developer: Responsible for implementing API endpoints, database schemas, and business logic.
